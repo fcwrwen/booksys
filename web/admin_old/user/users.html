@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看用户</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+</head>
+<body>
+<form id="cartForm" method="post" name="shoping" action="/shopping.html" onsubmit="return false;">
+    <input class="submit" id="search" type="text" />
+    <button class="submit" type="submit" onclick=find($("#search").val()) >查找用户</button>
+    <table>
+        <tr class="title">
+            <th>用户名</th>
+            <th>邮箱</th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tbody id="tbid">
+        <tr>
+            <td class="title">用户名</td>
+            <td>邮箱</td>
+            <td>解锁</td>
+            <td>删除</td>
+        </tr>
+        </tbody>
+
+    </table>
+</form>
+
+<script>
+    $(function () {
+        loadData();
+    });
+    
+    function loadData() {
+        $.ajax({
+            type:"get",
+            url:"/allusers",
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    $("#tbid").empty();
+                    var info=data.msg;
+                    //inex数组索引 item遍历元素
+                    $(info).each(function(index,item){
+                        var html='';
+                        html+='<tr>';
+                        html+='<td class="title">'+item.userName+'</td>';
+                        html+='<td>'+item.email+'</td>';
+                        html+='<td><button onclick=lockAndUnlock('+'\"'+item.userName+'\"';
+                        if(item.isLocked==1)
+                            html+=',true)>解锁';
+                        else html+=',false)>锁定';
+                        html+='</button></td>';
+                        html+='<td><button onclick=deleteUser("'+item.userName+'")>删除</button></td>';
+                        html+='</tr>';
+
+                        $("#tbid").append($(html));
+                    });
+                }else{
+                    alert(data.msg);
+                }
+            }
+        })
+    }
+
+    function find(name) {
+        if(name===""||name===null||name===undefined)
+            alert("请输入用户名");
+        else
+            window.open("user_detail.html?userName="+name);
+    }
+
+    function lockAndUnlock(name,isLocked) {
+        $.ajax({
+            type:"post",
+            url:"/user",
+            data:{_method:"put", userName:name, isLocked:isLocked},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    if(isLocked)
+                        alert("解锁成功");
+                    else alert("锁定成功");
+                    loadData();
+                }else{
+                    alert(data.msg);
+                    loadData();
+                }
+
+            }
+        })
+    }
+
+    function deleteUser(name) {
+        $.ajax({
+            type:"post",
+            url:"/user",
+            data:{_method:"delete", userName:name},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    alert("删除成功");
+                    loadData();
+                }else{
+                    alert(data.msg);
+                    loadData();
+                }
+
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

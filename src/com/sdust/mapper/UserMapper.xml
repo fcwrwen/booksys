@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sdust.dao.IUserDao">
+	<resultMap type="user" id="userMapper">
+		<id property="id" column="id"></id>
+		<result property="userName" column="u_name" />
+		<result property="password" column="password"/>
+		<result property="email" column="email"/>
+		<result property="isLocked" column="is_locked"/>
+	</resultMap>
+	
+	<select id="findByName" parameterType="string" resultMap="userMapper">
+		SELECT id, u_name, password, email, is_locked FROM user WHERE u_name=#{userName}
+	</select>
+	
+	<insert id="add" parameterType="user">
+		INSERT INTO user(u_name, password, email) VALUES(#{userName}, #{password}, #{email})
+	</insert>
+
+	<update id="changeLockState" parameterType="user">
+		UPDATE user SET is_locked=#{isLocked} WHERE u_name=#{userName}
+	</update>
+
+	<!--admin后台-->
+    <select id="countOrderByName" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM orders o
+		INNER JOIN user u
+		ON o.buyer_id = u.id
+		WHERE u.u_name = #{userName}
+	</select>
+
+    <delete id="delete" parameterType="user">
+        DELETE FROM user WHERE u_name=#{userName}
+    </delete>
+
+    <select id="findAll" resultMap="userMapper">
+        SELECT u_name, email, is_locked FROM user
+    </select>
+
+</mapper>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看图书</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+</head>
+<body>
+<div class="list bookList">
+    <form id="cartForm" method="post" name="shoping" action="/shopping.html" onsubmit="return false;">
+        <button type="button" onclick=window.open("add_book.html")>添加图书</button>
+        <button class="submit" type="submit" onclick=find($("#search").val()) >查找图书</button>
+        <input class="submit" id="search" type="text" />
+        <table>
+            <tr class="title">
+                <th>书名</th>
+                <th class="price">价格</th>
+                <th class="store">库存</th>
+                <th class="view">图片预览</th>
+                <th></th>
+                <th></th>
+            </tr>
+            <tbody id="tbid">
+            <tr>
+                <td><input type="checkbox" name="bookId" value="1" /></td>
+                <td class="title">测试数据</td>
+                <td>￥18.00</td>
+                <td>999</td>
+                <td class="thumb"><img src="/images/book/book_01.gif" /></td>
+            </tr>
+            </tbody>
+
+        </table>
+        <div class="page-spliter" style="width: 200px">
+            <a href="#">&lt;</a>
+            <a href="#">首页</a>
+            <span class="current">1</span>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <span>...</span>
+            <a href="#">尾页</a>
+            <a href="#">&gt;</a>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var thisPage=null;
+    $(function(){
+        loadData(1);
+    });
+
+    function loadData(page){
+        $.ajax({
+            type:"get",
+            url:"/books/page/"+page,
+            data:{judge:"back"},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    $("#tbid").empty();
+                    var info=data.msg.pageInfos;
+                    thisPage=data.msg.currentPage;
+                    //inex数组索引 item遍历元素
+                    $(info).each(function(index,item){
+                        var html='';
+                        if(index%2==0){ //偶数行
+                            html+='<tr>';
+                        }else{
+                            html+='<tr class="odd">';
+                        }
+                        html+='<td class="title">'+item.bookName+'</td>';
+                        html+='<td>'+item.price+'</td>';
+                        html+='<td>'+item.stock+'</td>';
+                        html+='<td class="thumb"><img src=/'+item.img+' />';
+                        html+='<td><button onclick=window.open("update_book.html?id='+item.id+'")>修改</button></td>';
+                        html+='<td><button onclick="deleteBook(';
+                        if(item.isDeleted==1)
+                            html+=item.id+',false)">恢复删除';
+                        else html+=item.id+',true)">删除';
+                        html+='</button></td>';
+                        html+='</tr>';
+
+                        $("#tbid").append($(html));
+                    });
+
+                    //绑定页码数据
+                    pagebind(data.msg);
+
+                }else{
+                    alert(data.msg);
+                }
+            }
+        })
+    }
+
+    //删除图书
+    function deleteBook(id,flag) {
+        $.ajax({
+            type:"post",
+            url:"/books",
+            data:{_method:"delete", id:id, flag:flag},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    if(flag)
+                        alert("删除成功");
+                    else alert("恢复成功");
+                    loadData(thisPage);
+                }else{
+                    alert(data.msg);
+                    loadData(thisPage);
+                }
+
+            }
+        })
+    }
+
+    //查找图书
+    function find(name) {
+        if(name===""||name===null||name===undefined)
+            alert("请输入书名");
+        else
+            window.open("book_detail.html?name="+name);
+    }
+
+</script>
+
+</body>
+</html>

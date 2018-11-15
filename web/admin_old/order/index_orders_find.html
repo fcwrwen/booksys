@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查询订单</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+</head>
+<body>
+<form>
+    <input class="submit" id="search" type="text" />
+    <button class="submit" type="submit">查找用户</button>
+</form>
+
+<script>
+    $("form").submit(function () {
+        var userName=$("#search").val();
+        if(userName===""||userName===null||userName===undefined)
+            alert("请输入用户名");
+        else
+            window.open("orders.html?page=1&name="+$("#search").val()+"&state=-1");
+    })
+</script>
+</body>
+</html>

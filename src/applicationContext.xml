@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- 注解扫描， base-package 表示扫描指定的包及子包下的注解 -->
+	<context:component-scan base-package="com.sdust">
+		<!-- 排除的注解 -->
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- 数据源对象: C3P0连接池 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql:///book_store?allowMultiQueries=true&amp;serverTimezone=UTC"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value="13839"></property>
+		<property name="initialPoolSize" value="3"></property>
+		<property name="maxPoolSize" value="10"></property>
+		<property name="maxStatements" value="100"></property>
+		<property name="acquireIncrement" value="2"></property>
+	</bean>
+
+
+	<!-- 创建mybatis的会话工厂对象 -->
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 设置数据源 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 加载mybatis主配置文件 -->
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<!-- 加载映射文件 -->
+		<property name="mapperLocations" value="classpath:com/sdust/mapper/*.xml" />
+
+	</bean>
+
+	<!-- 扫描映射代理的接口类,注入到spring容器中 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sessionFactory"></property>
+		<property name="basePackage" value="com.sdust.dao"></property>
+	</bean>
+
+	<!-- 1配置事务管理类 -->
+	<bean id="txManage"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+
+	<!-- 2配置事务的特性 -->
+	<tx:advice id="txAdvice" transaction-manager="txManage">
+		<tx:attributes>
+			<tx:method name="add*" read-only="false" propagation="REQUIRED" />
+			<tx:method name="find*" read-only="true" propagation="REQUIRED" />
+			<tx:method name="update*" read-only="false" propagation="REQUIRED" />
+			<tx:method name="delete*" read-only="false" propagation="REQUIRED" />
+			<tx:method name="get*" read-only="false" propagation="NOT_SUPPORTED" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 3AOP配置 -->
+	<aop:config>
+		<!-- 切入点 -->
+		<aop:pointcut expression="execution(* com.sdust.service.impl.*.*(..))"
+			id="pc" />
+
+		<!-- 通知 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pc" />
+
+	</aop:config>
+
+</beans>

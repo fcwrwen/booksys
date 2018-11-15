@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link type="text/css" rel="stylesheet" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+<div id="header" class="wrap">
+	<div id="logo">网上书城</div>
+	<div id="navbar">
+		<div class="userMenu">
+			<ul>
+				<li class="current"><a href="index.html">首页</a></li>
+				<li><a href="orderlist.html">我的订单</a></li>
+				<li><a href="shopping.html">购物车</a></li>
+				<li><a href="#" onclick="logout()">注销</a></li>
+			</ul>
+		</div>
+		<form method="get" name="search" action="">
+			搜索：<input class="input-text" type="text" name="keywords" /><input class="input-btn" type="submit" name="submit" value="" />
+		</form>
+	</div>
+</div>
+<div id="content" class="wrap">
+	<div class="list bookList">
+		<form id="cartForm" method="post" name="shoping" action="shopping.html" onsubmit="return false;">
+			<table>
+				<tr class="title">
+					<th class="checker"></th>
+					<th>书名</th>
+					<th class="price">价格</th>
+					<th class="store">库存</th>
+					<th class="view">图片预览</th>
+				</tr>
+				<tbody id="tbid">
+				<tr>
+					<td><input type="checkbox" name="bookId" value="1" /></td>
+					<td class="title">测试数据</td>
+					<td>￥18.00</td>
+					<td>999</td>
+					<td class="thumb"><img src="images/book/book_01.gif" /></td>
+				</tr>
+				</tbody>
+				
+			</table>
+			<div class="page-spliter">
+				<a href="#">&lt;</a>
+				<a href="#">首页</a>
+				<span class="current">1</span>
+				<a href="#">2</a>
+				<a href="#">3</a>
+				<a href="#">4</a>
+				<span>...</span>
+				<a href="#">尾页</a>
+				<a href="#">&gt;</a>
+			</div>
+			<div class="button"><input class="input-btn" type="submit" name="submit" value="" /></div>
+		</form>
+	</div>
+</div>
+<div id="footer" class="wrap">
+	JS &copy; 版权所有
+</div>
+
+<script type="text/javascript">
+	$(function(){
+		loadData(1);
+	});
+	
+	function loadData(page){
+		$.ajax({
+			type:"get",
+			url:"books/page/"+page,
+            data:{judge:"front"},
+			dataType:"json",
+			success:function(data){
+				if(data.code==1){
+					$("#tbid").empty();
+					var info=data.msg.pageInfos;
+					//inex数组索引 item遍历元素
+					$(info).each(function(index,item){
+						var html='';
+						if(index%2==0){ //偶数行
+							html+='<tr>';
+						}else{
+							html+='<tr class="odd">';
+						}
+						html+='<td><input type="checkbox" name="bookIds" value="'+item.id+'" /></td>';
+						html+='<td class="title">'+item.bookName+'</td>';
+						html+='<td>'+item.price+'</td>';
+						html+='<td>'+item.stock+'</td>';
+						html+='<td class="thumb"><img src="'+item.img+'" />';
+						html+='</td></tr>';
+						
+						$("#tbid").append($(html));
+					});
+					
+					//绑定页码数据
+					pagebind(data.msg);
+					
+				}else{
+					alert(data.msg);
+				}
+			}
+		})
+	}
+
+
+	
+</script>
+
+<!-- 提交购物车 -->
+<script type="text/javascript">
+	$("#cartForm").submit(function(){
+		if($(":checkbox:checked").length<1){
+			alert("请选择商品");
+			return;
+		}
+		
+		$.ajax({
+			type:"post",
+			url:"carts",
+			data:$("#cartForm").serialize(),
+			dataType:"json",
+			success:function(data){
+				if(data.code==1){
+					window.location.href="shopping.html";
+				}else{
+					alert(data.msg);
+				}
+			}
+		})
+	})
+
+</script>
+
+
+</body>
+</html>

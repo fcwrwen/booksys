@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>添加图书</title>
+<style>
+	label.error{
+		color:red;
+	}
+</style>
+<script src="/js/jquery-1.12.2.min.js"></script>
+<script src="/js/jquery.validate.min.js"></script>
+<script src="/js/jquery.form.min.js"></script>
+
+<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!--	 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+<ul class="nav nav-pills">
+
+    <a class="navbar-brand" href="../admin.html">Home</a>
+
+    <li role="presentation" class="active"><a href="books.html">图书管理</a></li>
+
+    <li role="presentation"><a href="../order/index_orders_find.html">订单管理</a></li>
+
+    <li role="presentation"><a href="../user/users.html">用户管理</a></li>
+
+</ul>
+
+
+
+<div id="upload" style="width: 960px; margin-left: auto; margin-right: auto;">
+
+    <form id="myform" role="form" method="post" action="/" enctype="multipart/form-data" onsubmit="return false;">
+        <h1></h1>
+
+        <div class="form-group">
+            <label for="name">书名</label>
+            <input name="bookName" type="text" class="form-control" placeholder="请输入书籍名称">
+        </div>
+        <div style="min-height:10px;"></div>
+
+        <div class="form-group">
+            <label for="name">价格</label>
+            <input name="price" type="number" class="form-control" placeholder="请输入书籍单价">
+        </div>
+        <div style="min-height:10px;"></div>
+
+        <div class="form-group">
+                <label for="name">库存</label>
+                <input name="stock" type="number" class="form-control" placeholder="请输入书籍库存">
+        </div>
+        <div style="min-height:10px;"></div>
+
+        
+        <div class="form-group">
+                <label for="inputfile">上传图片</label>
+                <input type="file" name="imgfile">
+        </div>
+        <div style="min-height:10px;"></div>
+
+        <br><br><br><br>
+        
+        <center>
+               <span>
+				   <button name="submit" type="submit" class="btn btn-primary">添加图书</button>
+			   </span>
+        </center>
+
+	</form>
+</div>
+
+
+
+
+
+<script>
+    $(function(){
+        $("#myform").validate({
+
+            submitHandler:function(){
+                //jquery.form.js中提供的异步上传文件的方法
+                $("form").ajaxSubmit({
+                    type:"post",
+                    url:"/upload.do",	//如果仅写"upload.do"为相对路径，相当于admin/xxx/upload.do
+                    data:$("form").serialize(),
+                    dataType:"json",
+                    success:function(data){
+                        window.location.href='add_success.html';
+                        // window.close();
+                        // window.location.reload();
+                    }
+                })
+            },
+
+            rules: {
+                bookName: "required",
+                price: {
+                    required: true,
+                    number:true,
+                    min:0
+                },
+                stock: {
+                    required: true,
+                    number:true,
+                    digits:true,
+                    min:0
+                },
+                imgfile: {
+                    required: true
+                }
+            },
+            messages:{
+                bookName:"书名不能为空",
+                price: {
+                    required: "价格不能为空",
+                    number:"请输入数字",
+                    min:"请输入正确的价格"
+                },
+                stock: {
+                    required: "库存不能为空",
+                    number:"请输入数字",
+                    digits:"库存必须为整数",
+                    min:"请输入正确的价格"
+                },
+                imgfile: {
+                    required: "请选择图片"
+                }
+            }
+
+        })
+    })
+</script>
+
+
+
+</body>
+</html>

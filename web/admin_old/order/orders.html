@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看订单</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+</head>
+<body>
+<form>
+    <!--※※※button默认type属性为submit，点击后会刷新页面，建议使用input※※※-->
+    <button type="button" onclick=loadData(1,thisName,-1)>全部订单</button>
+    <button type="button" onclick=loadData(1,thisName,0)>待发货</button>
+    <button type="button" onclick=loadData(1,thisName,1)>待收货</button>
+    <button type="button" onclick=loadData(1,thisName,2)>已完成</button>
+    <button type="button" onclick=loadData(1,thisName,3)>退货中</button>
+    <button type="button" onclick=loadData(1,thisName,4)>已退货</button>
+
+    <table>
+        <tr class="title">
+            <th class="orderId">订单编号</th>
+            <th>订单商品</th>
+            <th class="userName">收货人</th>
+            <th class="price">订单金额</th>
+            <th class="createTime">下单时间</th>
+            <th class="status">订单状态</th>
+        </tr>
+        <tbody id="tbid"></tbody>
+    </table>
+    <div class="page-spliter" style="width: 200px">
+        <a href="#">&lt;</a>
+        <a href="#">首页</a>
+        <span class="current">1</span>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">4</a>
+        <span>...</span>
+        <a href="#">尾页</a>
+        <a href="#">&gt;</a>
+    </div>
+</form>
+
+<script>
+    $(function () {
+        thisName = location.search.split("name=")[1].split("&state")[0];
+        loadData(1,thisName,-1);
+    });
+</script>
+
+<script>
+    var thisState=-1;
+    var thisName="";
+    var currentPage=0;
+    var thisOrder=null;
+    function loadData(page,name,state){
+        $("#tbid").empty();
+        $(".page-spliter").empty();
+        $.ajax({
+            type:"get",
+            url:"/adminorders/page/"+page,
+            data:{name:name,state:state},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    thisName=name;
+                    thisState=state;
+                    currentPage=data.msg.currentPage;
+                    var infos=data.msg.pageInfos;       //List<Order>
+                    $(infos).each(function(index,item){
+                        thisOrder=item.order;
+
+                        var html='<tr>';
+                        html+='<td>'+thisOrder.orderNum+'</td>';
+                        //悬浮显示书名
+                        html+='<td class="thumb"><img src="/'+item.book.img+'" title="'+item.book.bookName+'"/></td>';
+                        html+='<td>'+thisOrder.buyer.userName+'</td>';
+                        html+='<td>￥'+item.book.price+' x '+infos[index].num+'</td>';
+                        html+='<td>'+thisOrder.createDate+'</td>';
+                        switch (thisOrder.state){
+                            case 0:html+='<td>待发货</td>';break;      //0--未发货
+                            case 1:html+='<td>待收货</td>';break;      //1--已发货未签收
+                            case 2:html+='<td>已完成</td>';break;      //2--已签收
+                            case 3:html+='<td>退货中</td>';break;      //3--正在退货
+                            case 4:html+='<td>已退货</td>';break;      //4--已退货
+                            default:alert("订单号为"+thisOrder.orderNum+"的订单状态有误");    //其他
+                        }
+                        html+='</tr>';
+
+                        if(index==infos.length-1||thisOrder.orderNum!=infos[index+1].order.orderNum){
+                            html+='</tr>';
+                            html+='<tr><td colspan="6" align="right">';
+
+                            html+='总计金额：￥'+thisOrder.totalPrice+'元';
+                            html+="<button id='changeButton' type='button' onclick=change('"+thisOrder.orderNum+"',"+thisOrder.state+")>";
+                            switch (thisOrder.state){
+                                case 0:html+="发货";break;
+                                case 1:
+//                                    html+='style="display:none"';
+                                    html+="确认收货（前台）";break;
+                                case 2:
+//                                    html+='style="display:none"';
+                                    html+="申请退货（前台）";break;
+                                case 3:html+="签收退货";break;
+                                case 4:
+//                                    html+='style="display:none"';
+                                    html+="重新下单（模拟）";break;
+                                default:alert("订单号为"+thisOrder.orderNum+"的订单状态有误");
+                            }
+                            html+='</button>';
+                            html+='<button type="button" onclick=window.open("order_detail.html?orderNum='+thisOrder.orderNum+'")>查看</button>';
+                            html+='<button type="button" onclick=deleteOrder("'+thisOrder.orderNum+'")>删除</button>';
+                            html+='</td>';
+                            html+='</tr>';
+
+                        }
+                        $("#tbid").append($(html));
+
+                    });
+                    //绑定页码数据
+                    pagebind(data.msg,thisName,thisState);
+
+                }else{
+                    alert(data.msg);
+//                    window.close();
+                }
+            }
+        })
+    }
+</script>
+
+<script type="text/javascript">
+    function change(num,state) {
+//    function change(order){   //html不能传对象
+        $.ajax({
+            type:"post",
+            url:"/orders",
+            data:{_method:"put",orderNum:num, state:state},
+//			data:{_method:"put",order:order},
+            dataType:"json",
+            success:function(data){
+                if(data.code===1){
+//                    window.location.reload();
+                    loadData(currentPage,thisName,thisState);
+                }else{
+                    alert(data.msg);
+                }
+            }
+        })
+    }
+</script>
+
+<script>
+    function pagebind(info,name,state){
+        $(".page-spliter").empty();
+
+        var html='';
+        //计算上一页
+        var prePage=info.currentPage-1;
+        if(prePage<=0)
+            html+='<span>&lt;</span>';
+        else html+='<a href=javascript:loadData('+prePage+',"'+name+'",'+state+')>&lt;</a>'
+
+        //计算首页
+        html+='<a href=javascript:loadData(1'+',"'+name+'",'+state+')>首页</a>';
+
+        for(var i=1;i<=info.totalPage;i++){
+            if(i==info.currentPage)
+                html+='<span class="current">'+i+'</span>';
+            else html+='<a href=javascript:loadData('+i+',"'+name+'",'+state+')>'+i+'</a>';
+        }
+        //html+='<span>...</span>';
+
+        //计算尾页
+        html+='<a href=javascript:loadData('+info.totalPage+',"'+name+'",'+state+')>尾页</a>';
+
+        //计算下一页
+        var nextPage=info.currentPage+1;
+        if(nextPage>info.totalPage)
+            html+='<span>&gt;</span>';
+        else html+='<a href=javascript:loadData('+nextPage+',"'+name+'",'+state+')>&gt;</a>';
+
+        $(".page-spliter").append($(html));
+    }
+</script>
+
+<script>
+    function deleteOrder(num) {
+        if (confirm("确定删除？")) {
+            $.ajax({
+                type: "post",
+                url: "/orders",
+                data: {_method: "delete", orderNum: num},
+                dataType: "json",
+                success: function (data) {
+                    if (data.code == 1) {
+                        alert("删除成功");
+                        loadData(currentPage, thisName, thisState);
+                    } else
+                        alert(data.msg);
+                }
+            })
+        }
+    }
+</script>
+
+</body>
+</html>

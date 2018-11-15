@@ -1,0 +1,93 @@
+body { margin:0; padding:0; font-size:12px; line-height:20px; font-family:宋体; }
+.wrap { margin:0 auto; width:960px; }
+h2,h4,p,form,input,ul,li,dl,dt,dd { margin:0; padding:0; }
+table { border-collapse:collapse; }
+ul { list-style:none; }
+a:link, a:visited { color:#039; text-decoration:none; }
+a:hover, a:active { color:#03F; text-decoration:underline; }
+/* clearFix */
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+.clearfix{ display:block; display:inline-block; }
+
+.success { background:url(../images/success_ico.gif) 20px 20px no-repeat; }
+.success .information { margin-left:180px; }
+
+#header { }
+#header #logo { background:url(../images/logo.gif); width:120px; height:56px; text-indent:-1000em; }
+#header #navbar { color:#fff; background:#fc883b; padding:2px; line-height:25px; text-align:right; }
+#header .userMenu { float:left; }
+#header .userMenu ul li { float:left; margin:0px 2px; display:inline; }
+#header .userMenu ul li a { display:block; padding:0px 15px; text-decoration:none; background:#ffe0a3; white-space:nowrap; }
+#header .userMenu ul li.current a { font-weight:bold; background:#fff; }
+#header #navbar input { margin-right:5px; vertical-align:middle; border:1px solid #ccc; }
+#header #navbar input.input-text { padding:2px 3px; width:120px; height:16px; }
+#header #navbar input.input-btn { border:none; background:url(../images/button_search.gif); height:22px; width:46px; }
+
+#footer { border-top:2px solid #ccc; line-height:40px; text-align:center; }
+
+#login { border:1px solid #666; margin:80px auto; padding:4px; width:360px; }
+#login h2 { font-size:14px; line-height:30px; background:url(../images/login_lock.gif) 5px center no-repeat; border-bottom:2px solid #ccc;; padding-left:30px; color:#9a0000; }
+#login dl { line-height:50px; padding:5px; }
+#login dl dt { float:left; clear:left; width:60px; text-align:right; }
+#login dl dd { margin-left:60px; }
+#login dl dd input { margin:10px; vertical-align:middle; }
+#login dl dd input.input-text { border:1px solid #999999; font-size:14px; height:18px; width:150px; padding:4px 4px; }
+#login dl dd.button input { height:26px; border:none; cursor:pointer; }
+#login dl dd input.input-btn { background:url(../images/button_login.gif); width:77px; }
+#login dl dd input.input-reg { background:url(../images/button_register.gif); width:143px; }
+#login dl dd span { color:#f00; }
+
+#register { border:1px solid #666666; margin:40px auto; padding:4px; width:750px; }
+#register .title { background:#e7f6e5; }
+#register .title h2 { font-size:20px; color:#666; padding:15px 100px; }
+#register .steps { line-height:25px; margin:1px 0; }
+#register .steps ul li { float:left; color:#663300; background-color:#ffe0a3; background-position:right; background-repeat:no-repeat; width:375px; text-align:center; }
+#register .steps ul li.current { font-weight:bold; background-image:url(../images/step_arrow.gif); }
+#register .steps ul li.unpass { color:#000; background-color:#dfdfdf; }
+#register .steps ul li.past { background-image:url(../images/step_arrow_past.gif); }
+#register .steps ul li.last { font-weight:bold; }
+#register form { margin:10px auto; width:480px; }
+#register form dl { line-height:50px; padding:20px 0; font-size:14px; color:#333; }
+#register form dl dt { float:left; clear:left; width:78px; text-align:right; }
+#register form dl dd { margin-left:78px; }
+#register form dl dd input { margin:10px; vertical-align:middle; }
+#register form dl dd input.input-text { border:1px solid #999999; font-size:14px; height:18px; width:200px; padding:4px 4px; }
+#register form dl dd.button input { height:39px; border:none; cursor:pointer; }
+#register form dl dd input.input-reg { background:url(../images/button_reg.gif); width:154px; }
+#register form dl dd span { color:#f00; }
+#register .success { margin:50px auto; width:350px; }
+#register .success .information { padding:60px 0; line-height:40px; color:#f00; }
+
+#content { padding:4px 0; }
+#content .list table { width:100%; text-align:center; font-size:14px; color:#3f413e; }
+#content .list table tr th { line-height:26px; background:#ffeec2; border-top:1px solid #d3d3d3; border-bottom:1px solid #d3d3d3; }
+#content .list th.checker { width:40px; }
+#content .list th.price { width:80px; }
+#content .list th.store { width:80px; }
+#content .list th.view { width:150px; }
+#content .list th.nums { width:150px; }
+#content .list th.store { width:80px; }
+#content .list th.orderId { width:80px; }
+#content .list th.userName { width:80px; }
+#content .list th.price { width:80px; }
+#content .list th.createTime { width:140px; }
+#content .list th.status { width:80px; }
+#content .bookList table td { padding:10px 0; border-bottom:1px solid #8b8b8b; }
+#content .bookList table td.title { text-align:left; font-weight:bold; }
+#content .bookList table td.thumb img { border:1px solid #999; }
+#content .bookList table tr.odd td { background:#f4faee; }
+#content .bookList .input-text { border:1px solid #999; width:30px; text-align:center; }
+#content .list .button { padding:10px 0; text-align:right; }
+#content .list .button h4 { float:left; color:#f00; font-size:14px; }
+#content .list .button .input-gray { font-size:12px; border:none; background:url(../images/button_gray_bg.gif); color:#222; width:125px; height:22px; margin-left:10px; }
+#content .bookList .button .input-btn { border:none; background:url(../images/button_shop.gif); width:100px; height:22px; }
+#content .bookList .button .input-chart { border:none; background:url(../images/button_chart.png); width:128px; height:36px; }
+#content .orderList td { font-size:12px; border:1px solid #e1e1e1; padding:10px 0; }
+#content .orderList td.thumb img { border:1px solid #e1e1e1; }
+
+#content .page-spliter { text-align:center; font-size:14px; padding-top:20px; }
+#content .page-spliter * { margin:0 5px; }
+#content .page-spliter .current { font-weight:bold; border-bottom:1px solid #000; }
+
+#content .success { margin:50px auto; width:350px; font-size:14px; }
+#content .success .information { padding:60px 0; line-height:40px; color:#f00; }

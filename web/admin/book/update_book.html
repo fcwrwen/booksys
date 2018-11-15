@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改图书</title>
+    <style>
+        label.error{
+            color:red;
+        }
+    </style>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.form.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!--	 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+<ul class="nav nav-pills">
+
+    <a class="navbar-brand" href="../admin.html">Home</a>
+
+    <li role="presentation" class="active"><a href="books.html">图书管理</a></li>
+
+    <li role="presentation"><a href="../order/index_orders_find.html">订单管理</a></li>
+
+    <li role="presentation"><a href="../user/users.html">用户管理</a></li>
+
+</ul>
+
+<center>
+<form id="update" method="post" action="" enctype="multipart/form-data"  onsubmit="return false;">
+    <table id="book_info">
+        <input type="hidden" id="bid" name="id"/>
+        <tr>
+            <td width="50px">书名</td>
+            <td><input id="nid" class="input-text" type="text" name="bookName" /></td>
+        </tr>
+        <tr>
+            <td>价格</td>
+            <td><input id="pid" class="input-text" type="number" name="price" /></td>
+        </tr>
+        <tr>
+            <td>库存</td>
+            <td><input id="sid" class="input-text" type="number" name="stock" /></td>
+        </tr>
+        <tr id="picid">
+            <td>图片</td>
+            <td><input id="iid" class="input-text" type="file" name="imgfile" /></td>
+        </tr>
+        <tr>
+            <td class="button"><input class="input-btn" type="submit" name="submit" value="修改" /></td>
+            <td class="button"><input class="input-btn" type="button" value="取消" onclick=window.close();></td>
+        </tr>
+    </table>
+</form>
+</center>
+
+<script type="text/javascript">
+    $(function(){
+        $("form").validate({
+
+            submitHandler:function(){
+                $("form").ajaxSubmit({
+                    type: "post",
+                    url: "/updatebook",
+                    // data: {_method: "PUT", book: $("#update").serialize()},
+                    data:$("#update").serialize(),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.code == 1) {
+                            alert("修改成功");
+                            window.close();
+                            //window.location.reload();
+                            // parent.location.reload();
+                        } else {
+                            alert(data.msg);
+                        }
+                    }
+                })
+            },
+
+            rules: {
+                bookName: "required",
+                price: {
+                    required: true,
+                    number:true,
+                    min:0
+                },
+                stock: {
+                    required: true,
+                    number:true,
+                    digits:true,
+                    min:0
+                },
+                imgfile: {
+                    required: true
+                }
+            },
+            messages:{
+                bookName:"书名不能为空",
+                price: {
+                    required: "价格不能为空",
+                    number:"请输入数字",
+                    min:"请输入正确的价格"
+                },
+                stock: {
+                    required: "库存不能为空",
+                    number:"请输入数字",
+                    digits:"库存必须为整数",
+                    min:"请输入正确的价格"
+                },
+                imgfile: {
+                    required: "请选择图片"
+                }
+            }
+
+        })
+    });
+
+    $(function () {
+        $.ajax({
+            type:"get",
+            url:"/books"+location.search,   //获取从?开始的查询部分url，传递给后端spring读取
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+
+                    $("#bid").val(data.msg.id);
+                    $("#nid").val(data.msg.bookName);
+                    $("#pid").val(data.msg.price);
+                    $("#sid").val(data.msg.stock);
+                    hidebutton();
+
+                }else{
+                    console.log(data.msg);
+                }
+            }
+        })
+    });
+
+    function showbutton() {
+        $("#picid").empty();
+        var html='<td>图片</td>';
+        html+='<td><input id="iid" class="input-text" type="file" name="imgfile" /></td>';
+        html+='<td><button onclick="hidebutton()">×</button></td>';
+        $("#picid").append(html);
+    }
+
+    function hidebutton() {
+        $("#picid").empty();
+        var html='<td>图片</td>';
+        html+='<td><button id="addpic" name="addpic" onclick="showbutton()">修改图片</button></td>';
+        $("#picid").append(html);
+    }
+
+
+</script>
+
+</body>
+</html>

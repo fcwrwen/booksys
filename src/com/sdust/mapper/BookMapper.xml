@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sdust.dao.IBookDao">
+
+	<resultMap type="book" id="bookMapper">
+		<id property="id" column="id"/>
+		<!-- property=实体类属性名  column=数据表列名 -->
+		<result property="bookName" column="b_name"/>
+		<result property="price" column="price"/>
+		<result property="stock" column="stock"/>
+		<result property="img" column="img"/>
+        <result property="isDeleted" column="is_deleted"/>
+	</resultMap>
+
+	<select id="findByIndex" parameterType="map" resultMap="bookMapper">
+		SELECT id, b_name, price, stock, img, is_deleted FROM book
+		LIMIT #{index},#{size}
+	</select>
+
+	<select id="findByIndex_front" parameterType="map" resultMap="bookMapper">
+		SELECT id, b_name, price, stock, img FROM book
+		WHERE is_deleted=0
+		LIMIT #{index},#{size}
+	</select>
+	
+	<select id="count" resultType="int">
+		SELECT COUNT(1) FROM book
+	</select>
+	
+	<select id="findByIds" parameterType="list" resultMap="bookMapper">
+		SELECT id,b_name,price,stock,img FROM book WHERE id IN
+		<foreach collection="list" item="i" open="(" close=")" separator=",">
+			#{i}
+		</foreach>
+	</select>
+
+    <select id="findStockById" parameterType="int" resultType="int">
+        SELECT stock FROM book WHERE id=#{id}
+    </select>
+
+
+
+    <!-- 后台 -->
+	<insert id="add" parameterType="book">
+		INSERT INTO book(b_name, price, stock, img) VALUES(#{bookName}, #{price}, #{stock}, #{img})
+	</insert>
+
+	<update id="update" parameterType="book">
+		UPDATE book SET b_name=#{bookName}, price=#{price}, stock=#{stock}, img=#{img}
+		WHERE id=#{id}
+    </update>
+
+    <select id="findById" parameterType="int" resultMap="bookMapper">
+		SELECT id, b_name, price, stock, img, is_deleted FROM book WHERE id=#{id}
+    </select>
+
+	<select id="countOrderByBookId" parameterType="int" resultType="int">
+		SELECT COUNT(1) FROM order_items item
+		INNER JOIN book b
+		ON item.book_id = b.id
+		WHERE b.id = #{id}
+	</select>
+
+	<!--不删除，仅改状态-->
+	<delete id="delete" parameterType="book">
+		UPDATE book SET is_deleted=1 WHERE id=#{id}
+	</delete>
+
+    <!--恢复删除图书-->
+    <delete id="restore" parameterType="book">
+		UPDATE book SET is_deleted=0 WHERE id=#{id}
+	</delete>
+
+    <select id="findByName" parameterType="string" resultMap="bookMapper">
+        SELECT id, b_name, price, stock, img, is_deleted FROM book WHERE b_name LIKE CONCAT('%',#{bookName},'%')
+    </select>
+	
+</mapper>

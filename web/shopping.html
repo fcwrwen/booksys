@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link type="text/css" rel="stylesheet" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+<div id="header" class="wrap">
+	<div id="logo">网上书城</div>
+	<div id="navbar">
+		<div class="userMenu">
+			<ul>
+				<li><a href="index.html">首页</a></li>
+				<li><a href="orderlist.html">我的订单</a></li>
+				<li class="current"><a href="shopping.html">购物车</a></li>
+				<li><a href="#" onclick="logout()">注销</a></li>
+			</ul>
+		</div>
+		<form method="get" name="search" action="">
+			搜索：<input class="input-text" type="text" name="keywords" /><input class="input-btn" type="submit" name="submit" value="" />
+		</form>
+	</div>
+</div>
+<div id="content" class="wrap">
+	<div class="list bookList">
+		<form id="orderId" method="post" name="shoping" action="shopping-success.html" onsubmit="return false;">
+			<table>
+				<tr class="title">
+					<th class="view">图片预览</th>
+					<th>书名</th>
+					<th class="nums">数量</th>
+					<th class="price">价格</th>
+                    <th class="price">价格</th>
+
+				</tr>
+
+				<tbody id="tbid">
+				
+				<tr class="odd">
+					<td class="thumb"><img src="images/book/test.gif"/></td>
+					<td class="title">测试数据</td>
+					<td><input class="input-text" type="text" name="nums" value="1" /></td>
+					<td>￥<span>99.99</span></td>
+                    <td><button name="delete">删除</button></td>
+				</tr>
+				</tbody>
+				
+			</table>
+			<div class="button">
+				<h4>总价：￥<span id="priceId">0.00</span>元</h4>
+				<input class="input-chart" type="submit" name="submit" value="" onclick="ssubmit(this)"/>
+			</div>
+		</form>
+	</div>
+</div>
+<div id="footer" class="wrap">
+	JS &copy; 版权所有
+</div>
+
+<script type="text/javascript">
+    var infos=null;
+    var totalPrice=0;
+
+    $(function(){
+        loadData();
+    })
+
+</script>
+
+<script type="text/javascript">
+	function loadData(){
+        $("#tbid").empty();
+        $("#priceId").html(0);
+        $.ajax({
+            type:"get",
+            url:"carts",
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    infos=data.msg;
+                    totalPrice=0;
+                    $(infos).each(function(index,item){
+                        var html='';
+                        if(index%2==0) //偶数行
+                            html+='<tr>';
+                        else html+='<tr class="odd">';
+                        html += '<input type="hidden" name="ids" value="'+item.id+'"/>';
+                        html += '<td class="thumb"><img src="'+item.img+'"/></td>';
+                        html += '<td class="title">'+item.bookName+'</td>';
+                        html += '<td><input id="itemNum'+index+'" class="input-text" type="text" name="nums" value="1" /></td>';
+                        html += '<td>￥<span>'+item.price+'</span></td>';
+                        html += '<td><button name="delete" onclick="update('+item.id+')">删除</button></td>';
+                        html += '</tr>';
+                        $("#tbid").append($(html));
+                        totalPrice+=item.price;
+                        //totalPrice+=item.price*$("#itemNum").value;
+                    })
+                    $("#priceId").html(totalPrice);
+                    //})
+                }else{
+                    alert(data.msg);
+                    if(data.msg=="购物车为空")
+                        window.location.href="index.html";
+                }
+                $("input").change(function(){
+                    totalPrice=0;
+                    $(infos).each(function(index, item) {
+                        var t="#itemNum"+index;
+                        if($(t).val()>item.stock) {
+                            alert("库存不足");
+                            $(t).val(1);
+                        }
+                        if($(t).val()<1) {
+                            alert("数据有误");
+                            $(t).val(1);
+                        }
+                        totalPrice+=item.price*$(t).val();
+                    })
+                    $("#priceId").html(totalPrice);
+                })
+            }
+        })
+    }
+</script>
+
+<script type="text/javascript">
+    function ssubmit() {
+        var cookie=$.cookie('JSESSIONID');
+        if(cookie){         //下订单时判断是否登录，前台判断
+            $("#orderId").submit(function(){
+                var price="&totalPrice="+$("#priceId").text();
+                $.ajax({
+                    type:"post",
+                    url:"orders",
+                    data:$("#orderId").serialize()+price,
+                    dataType:"json",
+                    success:function(data){
+                        if(data.code==1){
+                            //alert(data);
+                            window.location.href="orderlist.html";
+                        }else{
+                            alert(data.msg);
+                            if(data.msg=="请登录后添加订单（后台判断）")      //前台判断失败，后台判断
+                                window.location.href="login.html";
+                        }
+                    }
+                })
+            })
+        }else{
+            alert("请登录后添加订单");
+            window.location.href="login.html";
+        }
+    }
+
+    function update(value){
+        var t="";
+        $(infos).each(function(){
+            if(value!=this.id)
+                t+="ids="+this.id+"&";
+        })
+        if(t==="")
+            t="ids=";
+        else
+            t=t.substring(0,t.length-1);
+        $.ajax({
+            type:"post",
+            url:"carts?"+t,
+            data:{_method:"PUT"},
+            dataType:"json",
+            success:function(data){
+                if(data.code===1){
+//                    window.location.reload();
+                    loadData();
+                }else{
+                    alert(data.msg);
+                }
+            }
+        })
+    }
+
+
+
+</script>
+
+</body>
+</html>

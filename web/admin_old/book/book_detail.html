@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图书详情</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+</head>
+<body>
+<form id="update" method="post" action="" enctype="multipart/form-data"  onsubmit="return false;">
+    <table id="book_info">
+        <input type="hidden" id="bid" name="id"/>
+
+    </table>
+</form>
+
+<script>
+    $(function () {
+        loadData();
+    });
+    function loadData() {
+        $.ajax({
+            type:"get",
+            url:"/findBooks"+location.search,   //获取从?开始的查询部分url，传递给后端spring读取
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    $("#book_info").empty();
+                    //data.msg 是一个list集合
+                    var infos=data.msg;
+                    if(infos.length==0) {
+                        alert("未找到图书");
+                        window.close();
+                    }
+                    var html='';
+                    $(infos).each(function(index,item) {
+                        html+='<tr>' +
+                            '    <td width="50px">书名</td>' +
+                            '    <td>'+item.bookName+'</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                            '    <td>价格</td>' +
+                            '    <td>'+item.price+'</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                            '    <td>库存</td>' +
+                            '    <td>'+item.stock+'</td>' +
+                            '</tr>' +
+                            '<tr id="picid">' +
+                            '    <td>图片</td>' +
+                            '    <td><img src=/'+item.img+' /></td>' +
+                            '</tr>' +
+                            '<tr>' +
+                            '    <td><button onclick=window.open("update_book.html?id='+item.id+'")>修改</button></td>' +
+                            '    <td><button onclick="deleteBook(';
+                        if(item.isDeleted==1)
+                            html+=item.id+',false)">恢复删除';
+                        else html+=item.id+',true)">删除';
+                        html+='</button></td>' +
+                            '</tr>' +
+                            '<tr style="height:50px"></tr>';
+                    });
+                    html+='<tr>' +
+                        '<td class="button"><input class="input-btn" type="button" value="关闭" onclick=window.close();></td>' +
+                        '</tr>';
+                    $("#book_info").append($(html));
+                }else{
+                    alert(data.msg);
+                    window.close();
+                }
+            }
+        })
+    }
+
+    function deleteBook(id,flag) {
+        $.ajax({
+            type:"post",
+            url:"/books",
+            data:{_method:"delete", id:id, flag:flag},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    if(flag)
+                        alert("删除成功");
+                    else alert("恢复成功");
+                    loadData();
+                }else{
+                    alert(data.msg);
+                    loadData();
+                }
+
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

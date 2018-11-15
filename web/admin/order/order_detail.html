@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单详情</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!--	 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</head>
+<body>
+<ul class="nav nav-pills">
+
+    <a class="navbar-brand" href="../admin.html">Home</a>
+
+    <li role="presentation" ><a href="../book/books.html">图书管理</a></li>
+
+    <li role="presentation" class="active"><a href="index_orders_find.html">订单管理</a></li>
+
+    <li role="presentation"><a href="../user/users.html">用户管理</a></li>
+
+</ul>
+<form>
+    <table class="table table-bordered">
+        <tbody id="tbid">
+        <tr>
+            <td>订单号</td>
+            <td>123</td>
+        </tr>
+        <tr>
+            <td>收货人</td>
+            <td>123</td>
+        </tr>
+        <tr>
+            <td>下单时间</td>
+            <td>123</td>
+        </tr>
+        <tr>
+            <td>订单状态</td>
+            <td>123</td>
+        </tr>
+        <tr>
+            <td>总计金额</td>
+            <td>123</td>
+        </tr>
+        <tr>
+            <td>订单商品</td>
+            <td>test1</td>
+            <td>￥11</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>test2</td>
+            <td>￥12</td>
+        </tr>
+        <tr>
+            <td><button>改变状态</button></td>
+            <td><button>删除</button></td>
+        </tr>
+        </tbody>
+        <tr>
+            <td><button class="btn btn-danger" onclick=window.close()>关闭</button></td>
+        </tr>
+    </table>
+</form>
+
+<script>
+    $(function () {
+        loadData();
+    });
+
+    function loadData() {
+       $.ajax({
+           type:"get",
+           url:"/orders"+location.search,
+           dataType:"json",
+           success:function (data) {
+               $("#tbid").empty();
+               if(data.code==1){
+                   var infos=data.msg;      //List<OrderItem>
+                   var firstOrder=infos[0].order;
+                   var html='<tr>'+
+                        '<td>订单号</td>'+
+                        '<td>'+firstOrder.orderNum+'</td>'+
+                        '</tr><tr>'+
+                        '<td>收货人</td>'+
+                        '<td>'+firstOrder.buyer.userName+'</td>'+
+                        '</tr><tr>'+
+                        '<td>下单时间</td>'+
+                        '<td>'+firstOrder.createDate+'</td>'+
+                        '</tr><tr>'+
+                        '<td>订单状态</td>';
+                   switch (firstOrder.state){
+                       case 0:html+='<td>待发货</td>';break;      //0--未发货
+                       case 1:html+='<td>待收货</td>';break;      //1--已发货未签收
+                       case 2:html+='<td>已完成</td>';break;      //2--已签收
+                       case 3:html+='<td>退货中</td>';break;      //3--正在退货
+                       case 4:html+='<td>已退货</td>';break;      //4--已退货
+                       default:alert("订单号为"+firstOrder.orderNum+"的订单状态有误");    //其他
+                   }
+                   html+='</tr><tr>'+
+                        '<td>总计金额</td>'+
+                        '<td>￥'+firstOrder.totalPrice+'</td>'+
+                        '</tr>';
+                   $(infos).each(function (index,item) {
+                       html+='<tr><td>';
+                       if(index==0)
+                           html+='订单商品';
+                       html+='</td>'+
+                             '<td><img src="/'+item.book.img+'"/>'+
+//                             '<td>'+item.book.bookName+'</td>'+
+//                             '<td>￥'+item.book.price+'×'+item.num+'</td></tr>';
+                             item.book.bookName+
+                             ' ￥'+item.book.price+'×'+item.num+'</td></tr>';
+                   });
+                   html+='<tr><td>';
+                   html+='<button type="button" onclick=change("'+firstOrder.orderNum+'",'+firstOrder.state+') ';
+                   switch (firstOrder.state){
+                       case 0:html+=">发货";break;
+                       case 1:
+                           html+='style="display:none"';
+                           html+=">确认收货（前台）";break;
+                       case 2:
+                           html+='style="display:none"';
+                           html+=">申请退货（前台）";break;
+                       case 3:html+=">签收退货";break;
+                       case 4:
+//                           html+='style="display:none"';
+                           html+=">重新下单（模拟）";break;
+                       default:
+                           html+='/>';
+                           alert("订单号为"+firstOrder.orderNum+"的订单状态有误");
+                   }
+                   html+='</button>' +
+                         '<button type="button" onclick=deleteOrder("'+firstOrder.orderNum+'")>删除</button>'+
+                         '</tr>';
+                   $("#tbid").append($(html));
+               }else{
+                   alert(data.msg);
+                   window.close();
+               }
+           }
+       })
+    }
+
+    function deleteOrder(num) {
+        if (confirm("确定删除？")) {
+            $.ajax({
+                type: "post",
+                url: "/orders",
+                data: {_method: "delete", orderNum: num},
+                dataType: "json",
+                success: function (data) {
+                    if (data.code == 1) {
+                        alert("删除成功");
+                        window.close();
+                    } else
+                        alert(data.msg);
+                }
+            })
+        }
+    }
+
+    function change(num,state) {
+        $.ajax({
+            type:"post",
+            url:"/orders",
+            data:{_method:"put",orderNum:num, state:state},
+            dataType:"json",
+            success:function(data){
+                if(data.code===1){
+                    loadData();
+                }else{
+                    alert(data.msg);
+                }
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

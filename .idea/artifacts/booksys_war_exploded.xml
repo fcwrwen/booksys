@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="booksys:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/booksys_war_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="booksys/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="booksys" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="lib" />
+          <element id="library" level="project" name="Arquillian JUnit:Release" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

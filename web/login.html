@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link type="text/css" rel="stylesheet" href="css/style.css" />
+
+<style>
+	label.error{
+		color:red;
+	}
+</style>
+
+<script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
+<!-- 进行表单验证，validate库依赖于jQuery，先引入后者 -->
+<script type="text/javascript" src="js/jquery.validate.min.js"></script>
+
+</head>	
+<body>
+<div id="header" class="wrap">
+	<div id="logo">网上书城</div>
+	<div id="navbar">
+		<form method="get" name="search" action="">
+			搜索：<input class="input-text" type="text" name="keywords" /><input class="input-btn" type="submit" name="submit" value="" />
+		</form>
+	</div>
+</div>
+<div id="login">
+	<h2>用户登陆</h2>
+	<form id="loginForm" method="post" action="" onsubmit="return false;">
+		<dl>
+			<dt>用户名：</dt>
+			<dd><input class="input-text" type="text" name="userName" /></dd>
+			<dt>密　码：</dt>
+			<dd><input class="input-text" type="password" name="password" /></dd>
+			<dd><label id="errorinfo" class="error"></label></dd>
+			<dt></dt>
+			<dd class="button"><input class="input-btn" type="submit" name="submit" value="" /><input class="input-reg" type="button" name="register" value="" onclick="window.location='register.html';" /></dd>
+		</dl>
+	</form>
+</div>
+<div id="footer" class="wrap">
+	JS &copy; 版权所有
+</div>
+
+<script type="text/javascript">
+	$(function(){
+		$("#loginForm").validate({
+			//判断规则
+			rules: {
+				userName:"required",
+				password: {
+					required: true,
+					minlength: 6
+				}
+			},
+			//提示信息
+			messages:{
+				userName:"用户名不能为空",
+				password:{
+					required:"密码不能为空",
+					minlength:"密码长度不能少于6位"
+				}
+			},
+			//提交操作
+			submitHandler:function(){
+				$.ajax({
+					type:"post",
+					url:"login",
+					data:$("#loginForm").serialize(),
+					dataType:"json",
+					success:function(data){
+						if(data.code === 1){
+							window.location.href="index.html";
+						}else{
+							alert(data.msg);
+							//$("#errorinfo").text(data.msg);
+						}
+					}
+				})
+			}
+		})
+	})
+</script>
+
+
+</body>
+</html>

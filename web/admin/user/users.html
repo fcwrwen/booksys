@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看用户</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!--	 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+<ul class="nav nav-pills">
+
+    <a class="navbar-brand" href="../admin.html">Home</a>
+
+    <li role="presentation"><a href="../book/books.html">图书管理</a></li>
+
+    <li role="presentation"><a href="../order/index_orders_find.html">订单管理</a></li>
+
+    <li role="presentation" class="active"><a href="users.html">用户管理</a></li>
+
+</ul>
+
+
+
+<form id="cartForm" method="post" name="shoping" action="/shopping.html" onsubmit="return false;">
+
+    <br>
+    <div class="col-lg-6 col-md-offset-3">
+        <div class="input-group">
+            <input id="search" type="text" class="form-control" placeholder="请输入用户名">
+            <span class="input-group-btn">
+        <button class="btn btn-default" type="submit" onclick=find($("#search").val())>查找用户</button>
+    </span>
+        </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+
+    <br><br><br><br>
+
+    <center>
+    <table class="table table-bordered">
+        <tr class="title">
+            <th>用户名</th>
+            <th>邮箱</th>
+            <th>锁定</th>
+            <th>删除</th>
+        </tr>
+        <tbody id="tbid">
+        <tr>
+            <td class="title">用户名</td>
+            <td>邮箱</td>
+            <td>解锁</td>
+            <td>删除</td>
+        </tr>
+        </tbody>
+
+    </table>
+    </center>
+</form>
+
+<script>
+    $(function () {
+        loadData();
+    });
+    
+    function loadData() {
+        $.ajax({
+            type:"get",
+            url:"/allusers",
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    $("#tbid").empty();
+                    var info=data.msg;
+                    //inex数组索引 item遍历元素
+                    $(info).each(function(index,item){
+                        var html='';
+                        html+='<tr>';
+                        html+='<td class="title">'+item.userName+'</td>';
+                        html+='<td>'+item.email+'</td>';
+                        html+='<td><button class="btn btn-warning" onclick=lockAndUnlock('+'\"'+item.userName+'\"';
+                        if(item.isLocked==1)
+                            html+=',true)>解锁';
+                        else html+=',false)>锁定';
+                        html+='</button></td>';
+                        html+='<td><button class="btn btn-danger" onclick=deleteUser("'+item.userName+'")>删除</button></td>';
+                        html+='</tr>';
+
+                        $("#tbid").append($(html));
+                    });
+                }else{
+                    alert(data.msg);
+                }
+            }
+        })
+    }
+
+    function find(name) {
+        if(name===""||name===null||name===undefined)
+            alert("请输入用户名");
+        else
+            window.open("user_detail.html?userName="+name);
+    }
+
+    function lockAndUnlock(name,isLocked) {
+        $.ajax({
+            type:"post",
+            url:"/user",
+            data:{_method:"put", userName:name, isLocked:isLocked},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    if(isLocked)
+                        alert("解锁成功");
+                    else alert("锁定成功");
+                    loadData();
+                }else{
+                    alert(data.msg);
+                    loadData();
+                }
+
+            }
+        })
+    }
+
+    function deleteUser(name) {
+        $.ajax({
+            type:"post",
+            url:"/user",
+            data:{_method:"delete", userName:name},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    alert("删除成功");
+                    loadData();
+                }else{
+                    alert(data.msg);
+                    loadData();
+                }
+
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

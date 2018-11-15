@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sdust.dao.IOrderDao">
+
+	<resultMap type="order" id="orderMapper">
+		<id property="id" column="id"/>
+		<result property="orderNum" column="o_num"/>
+		<result property="totalPrice" column="total_price"/>
+		<result property="createDate" column="create_date"/>
+		<result property="state" column="state"/>
+		<!-- 体现一对多中的一，用户：订单=1：n，单个订单对应单个用户 -->
+		<association property="buyer" resultMap="com.sdust.dao.IUserDao.userMapper"></association>
+	</resultMap>
+	
+	<!-- userGK keyP 获得自增的值 -->
+	<!-- attention:order为MySQL数据库保留字，不应以此为表名 -->
+	<insert id="add" parameterType="order" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO orders(o_num, total_price, create_date, state, buyer_id)
+		VALUES (#{orderNum}, #{totalPrice}, #{createDate}, #{state}, #{buyer.id});
+	</insert>
+
+	<select id="countByName" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM orders o
+		INNER JOIN user u
+		ON o.buyer_id=u.id
+		WHERE u.u_name=#{userName}
+	</select>
+	<select id="countByName0" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM orders o
+		INNER JOIN user u
+		ON o.buyer_id=u.id
+		WHERE u.u_name=#{userName}
+		AND o.state=0
+	</select>
+	<select id="countByName1" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM orders o
+			INNER JOIN user u
+				ON o.buyer_id=u.id
+		WHERE u.u_name=#{userName}
+			  AND o.state=1
+	</select>
+	<select id="countByName2" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM orders o
+			INNER JOIN user u
+				ON o.buyer_id=u.id
+		WHERE u.u_name=#{userName}
+			  AND o.state=2
+	</select>
+	<select id="countByName3" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM orders o
+			INNER JOIN user u
+				ON o.buyer_id=u.id
+		WHERE u.u_name=#{userName}
+			  AND o.state=3
+	</select>
+	<select id="countByName4" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM orders o
+			INNER JOIN user u
+				ON o.buyer_id=u.id
+		WHERE u.u_name=#{userName}
+			  AND o.state=4
+	</select>
+
+	<update id="changeState" parameterType="order">
+        UPDATE orders SET state=#{state} WHERE o_num=#{orderNum}
+    </update>
+
+	<delete id="delete" parameterType="order">
+		DELETE FROM orders WHERE o_num=#{orderNum}
+	</delete>
+
+</mapper>

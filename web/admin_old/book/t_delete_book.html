@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>删除图书（仅测试）</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+</head>
+<body>
+    <form method="post" action="/" enctype="multipart/form-data" onsubmit="return false;">
+        <tr><input id="id" type="text" name="id"/></tr>
+        <tr><input type="submit" name="submit" value="删除" /></tr>
+    </form>
+
+    <script type="text/javascript">
+        $("form").submit(function(){
+            $.ajax({
+                type:"post",
+                url:"/books",
+                data:{_method:"delete",id:$("#id").val(), flag:true},
+                dataType:"json",
+                success:function(data){
+                    if(data.code==1){
+                        alert("删除成功，跳转");
+                        window.location.reload();
+                    }else{
+                        alert(data.msg);
+                        window.location.reload();
+                    }
+
+                }
+            })
+        })
+    </script>
+</body>
+</html>

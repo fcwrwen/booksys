@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<settings>
+		<!-- 启用懒加载，如下两个配置必须写 -->
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+		
+		<!-- 开启二级缓存 -->
+		<!-- <setting name="cacheEnabled" value="true"/> -->
+	</settings>
+
+	<!-- 设置类型的别名 -->
+	<typeAliases>
+		<typeAlias type="com.sdust.entity.User" alias="user"/>
+		<typeAlias type="com.sdust.entity.Book" alias="book"/>
+		<typeAlias type="com.sdust.entity.Order" alias="order"/>
+		<typeAlias type="com.sdust.entity.OrderItem" alias="item"/>
+		
+	</typeAliases>
+	
+	<mappers>
+		
+	</mappers>
+</configuration>
+
+

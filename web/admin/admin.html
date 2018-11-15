@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>添加图书</title>
+<style>
+	label.error{
+		color:red;
+	}
+</style>
+<script src="/js/jquery-1.12.2.min.js"></script>
+<script src="/js/jquery.validate.min.js"></script>
+<script src="/js/jquery.form.min.js"></script>
+
+<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<!--	 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+</head>
+
+<body>
+<ul class="nav nav-pills">
+
+    <a class="navbar-brand" href="admin.html">Home</a>
+
+    <li role="presentation"><a href="book/books.html">图书管理</a></li>
+
+    <li role="presentation"><a href="order/index_orders_find.html">订单管理</a></li>
+
+    <li role="presentation"><a href="user/users.html">用户管理</a></li>
+
+</ul>
+
+    <div class="jumbotron">
+        <h1>&nbsp&nbsp&nbsp欢迎使用图书管理后台系统
+        </h1>
+        <p>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp主要功能为：图书管理、订单管理、用户管理</p>
+        <p>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspcopyright &copy; SDUST B14-217版权所有</p>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+          <div class="thumbnail">
+            <img src="../images/frontend/1.jpg" alt="..." height="700" width="350">
+            <div class="caption">
+              <h4>对图书进行添加、修改、删除、查询等操作...</h4>
+              <p><a href="book/books.html" class="btn btn-primary" role="button">图书管理</a></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+                <img src="../images/frontend/3.jpg" alt="..." height="530" width="350">
+                <div class="caption">
+                    <h4>查看订单、发货、退货...</h4>
+                    <p><a href="order/index_orders_find.html" class="btn btn-primary" role="button">订单管理</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+                <img src="../images/frontend/2.jpg" alt="..." height="530" width="350">
+                <div class="caption">
+                    <h4>删除、查询、解锁用户...</h4>
+                    <p><a href="user/users.html" class="btn btn-primary" role="button">用户管理</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户详情</title>
+    <script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!--	 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</head>
+<body>
+<ul class="nav nav-pills">
+
+    <a class="navbar-brand" href="../admin.html">Home</a>
+
+    <li role="presentation"><a href="../book/books.html">图书管理</a></li>
+
+    <li role="presentation"><a href="../order/index_orders_find.html">订单管理</a></li>
+
+    <li role="presentation" class="active"><a href="users.html">用户管理</a></li>
+
+</ul>
+
+<form id="update" method="post" action="" enctype="multipart/form-data"  onsubmit="return false;">
+    <table class="table table-bordered" id="user_info"></table>
+</form>
+
+<script>
+    $(function () {
+        loadData();
+    });
+    function loadData() {
+        $.ajax({
+            type:"get",
+            url:"/user"+location.search,   //获取从?开始的查询部分url，传递给后端spring读取
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    $("#user_info").empty();
+                    var info=data.msg;
+                    if(info==null) {
+                        alert("未找到用户");
+                        window.close();
+                    }
+                    var html='<tr>' +
+                        '    <td width="50px">用户名</td>' +
+                        '    <td>'+info.userName+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '    <td>密码</td>' +
+                        '    <td>'+info.password+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '    <td>邮箱</td>' +
+                        '    <td>'+info.email+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '    <td><button class="btn btn-primary"  onclick=lockAndUnlock('+'\"'+info.userName+'\"';
+                    if(info.isLocked==1)
+                        html+=',true)>解锁';
+                    else
+                        html+=',false)>锁定';
+                    html+='</button></td>' +
+                        '</tr>';
+
+
+                    $("#user_info").append($(html));
+                }else{
+                    alert(data.msg);
+                    window.close();
+                }
+            }
+        })
+    }
+
+    function lockAndUnlock(name,isLocked) {
+        $.ajax({
+            type:"post",
+            url:"/user",
+            data:{_method:"put", userName:name, isLocked:isLocked},
+            dataType:"json",
+            success:function(data){
+                if(data.code==1){
+                    if(isLocked)
+                        alert("解锁成功");
+                    else alert("锁定成功");
+                    loadData();
+                }else{
+                    alert(data.msg);
+                    loadData();
+                }
+
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

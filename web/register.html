@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link type="text/css" rel="stylesheet" href="css/style.css" />
+
+	<style>
+		label.error{
+			color:red;
+		}
+	</style>
+<script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.validate.min.js"></script>
+
+</head>
+<body>
+<div id="header" class="wrap">
+	<div id="logo">网上书城</div>
+	<div id="navbar">
+		<form method="get" name="search" action="">
+			搜索：<input class="input-text" type="text" name="keywords" /><input class="input-btn" type="submit" name="submit" value="" />
+		</form>
+	</div>
+</div>
+<div id="register">
+	<div class="title">
+		<h2>欢迎注册</h2>
+	</div>
+	<div class="steps">
+		<ul class="clearfix">
+			<li class="current">1.填写注册信息</li>
+			<li class="unpass">2.注册成功</li>
+		</ul>
+	</div>
+	<form id="reForm" method="post" action="register_success.html" onsubmit="return false;">
+		<dl>
+			<dt>用 户 名：</dt>
+			<dd><input class="input-text" type="text" name="userName" onblur="check(this)"/></dd>
+			<dt>密　　码：</dt>
+			<dd><input class="input-text" type="password" name="password" /></dd>
+			<dt>确认密码：</dt>
+			<dd><input class="input-text" type="password" name="rePassword" /></dd>
+			<dt>Email地址：</dt>
+			<dd><input class="input-text" type="text" name="email" /></dd>
+			<dt></dt>
+			<dd class="button"><input class="input-reg" type="submit" name="register" value="" /></dd>
+		</dl>
+	</form>
+</div>
+<div id="footer" class="wrap">
+	JS &copy; 版权所有
+</div>
+
+<script type="text/javascript">
+	$(function(){
+		$("#reForm").validate({
+			
+			submitHandler:function(){
+				var user={
+					u_name:$("#userName").val(),
+					password:$("#password").val(),
+					rePassword:$("#rePassword").val(),
+					email:$("#email").val()
+				};
+
+				$.ajax({
+					type:"post",
+					url:"register",
+					data:$("#reForm").serialize(),
+					// data:user,
+					dataType:"json",
+					success:function(data){
+						if(data.code==1){
+							window.location.href="login.html";
+						}else{
+							alert(data.msg);
+						}
+					}
+				})
+			},
+			
+			rules: {
+				userName: "required",
+				password: {
+					required: true,
+					minlength: 6
+				},
+				rePassword: {
+					required: true,
+					minlength: 6
+					//equalTo: "#password"
+				},
+				email: {
+					required: true,
+					email: true
+				}
+			},
+			messages:{
+				userName:"用户名不能为空",
+				password:{
+					required:"密码不能为空",
+					minlength:"密码不能少于6位"
+				},
+				rePassword:{
+					required:"确认密码不能为空",
+					minlength:"密码不能少于6位",
+					equalTo:"两次输入的密码不一致"
+				},
+				email:{
+					required:"必须输入邮箱",
+					minlength:"邮箱格式不符",
+					email:"请输入正确的邮箱地址"
+				}
+			},
+			
+		})
+	})
+</script>
+
+<script type="text/javascript">
+	function check(ele){
+		$.ajax({
+			type:"get",
+			url:"check?userName="+ele.value,
+			dataType:"json",
+			success:function(data){
+				if(data.code==-1){
+					alert("用户名已存在");
+				}else if(data.code==0){
+					alert(data.msg);
+				}
+			}
+		})
+	}
+
+</script>
+
+</body>
+</html>

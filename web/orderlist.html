@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link type="text/css" rel="stylesheet" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div id="header" class="wrap">
+		<div id="logo">网上书城</div>
+		<div id="navbar">
+			<div class="userMenu">
+				<ul>
+					<li><a href="index.html">首页</a></li>
+					<li class="current"><a href="orderlist.html">我的订单</a></li>
+					<li><a href="shopping.html">购物车</a></li>
+					<li><a href="#" onclick="logout()">注销</a></li>
+				</ul>
+			</div>
+			<form method="get" name="search" action="">
+				搜索：<input class="input-text" type="text" name="keywords" /><input
+					class="input-btn" type="submit" name="submit" value="" />
+			</form>
+		</div>
+	</div>
+	<div id="content" class="wrap">
+		<div class="list orderList">
+			<table>
+				<tr class="title">
+					<th class="orderId">订单编号</th>
+					<th>订单商品</th>
+					<th class="userName">收货人</th>
+					<th class="price">订单金额</th>
+					<th class="createTime">下单时间</th>
+					<th class="status">订单状态</th>
+				</tr>
+
+				<tbody id="tbid">
+				<tr>
+					<td>10010</td>
+					<td class="thumb"><img src="images/book/test.gif" /></td>
+					<td>测试数据</td>
+					<td>￥99.99 x 1</td>
+					<td>2012-12-21 12:00:00</td>
+					<td>未完成</td>
+				</tr>
+				
+				<tr>
+					<td colspan="6" align="right">总计金额：￥99.99元
+						<button>确认收货</button>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+			<div class="page-spliter">
+				<a href="#">&lt;</a> <a href="#">首页</a> <span class="current">1</span>
+				<a href="#">2</a> <a href="#">3</a> <a href="#">4</a> <span>...</span>
+				<a href="#">尾页</a> <a href="#">&gt;</a>
+			</div>
+			<!-- <div class="button"><input class="input-gray" type="submit" name="submit" value="查看一个月前的订单" /><input class="input-gray" type="submit" name="submit" value="查看一个月前的订单" /></div> -->
+		</div>
+	</div>
+	<div id="footer" class="wrap">JS &copy; 版权所有</div>
+
+<script>
+	$(function(){
+		loadData(1);
+	})
+</script>
+
+
+<script>
+    var currentPage=0;
+	function loadData(page){
+        $("#tbid").empty();
+		$.ajax({
+			type:"get",
+			url:"orders/page/"+page,
+			dataType:"json",
+			success:function(data){
+			    currentPage=data.msg.currentPage;
+				if(data.code==1){
+					var infos=data.msg.pageInfos;       //List<OrderItem>
+					$(infos).each(function(index,item){
+						var thisOrder=item.order;
+						
+						var html='<tr>';
+						html+='<td>'+thisOrder.orderNum+'</td>';
+						//悬浮显示书名
+						html+='<td class="thumb"><img src="'+item.book.img+'" title="'+infos[index].book.bookName+'"/></td>';
+						html+='<td>'+thisOrder.buyer.userName+'</td>';
+						html+='<td>￥'+item.book.price+' x '+infos[index].num+'</td>';
+						html+='&lt;td>'+thisOrder.createDate+'</td>';
+						switch (thisOrder.state){
+                            case 0:html+='<td>待发货</td>';break;      //0--未发货
+                            case 1:html+='<td>待收货</td>';break;      //1--已发货未签收
+                            case 2:html+='<td>已完成</td>';break;      //2--已签收
+                            case 3:html+='<td>退货中</td>';break;      //3--正在退货
+                            case 4:html+='<td>已退货</td>';break;      //4--已退货
+                            default:alert("订单号为"+thisOrder.orderNum+"的订单状态有误");    //其他
+                        }
+						html+='</tr>';
+						
+						if(index==infos.length-1||thisOrder.orderNum!=infos[index+1].order.orderNum){
+							html+='</tr>';
+							html+='<tr><td colspan="6" align="right">';
+							html+='总计金额：￥'+thisOrder.totalPrice+'元';
+                            html+='<button id="changeButton" type="button" onclick=change("'+thisOrder.orderNum+'",'+thisOrder.state+') ';
+                            switch (thisOrder.state){
+                                case 0:
+                                    html+='style="display:none"';
+                                    html+=">发货（后台）";break;
+                                case 1:html+=">确认收货";break;
+                                case 2:html+=">申请退货";break;
+                                case 3:
+                                    html+='style="display:none"';
+                                    html+=">签收退货（后台）";break;
+                                case 4:
+                                    html+='style="display:none"';
+                                    html+=">重新下单（模拟）";break;
+                                default:
+                                    html+="/>";
+                                    alert("订单号为"+thisOrder.orderNum+"的订单状态有误");
+                            }
+                            html+='</button></td></tr>';
+						}
+							
+						$("#tbid").append($(html));
+						
+					})
+					//绑定页码数据
+					pagebind(data.msg);
+					
+				}else{
+					alert(data.msg);
+					if(data.msg=="请登录后查看订单")
+					    window.location.href="login.html";
+				}
+			}
+		})
+	}
+</script>
+
+<script type="text/javascript">
+    function change(num,state) {
+//    function change(order){   //html不能传对象
+        $.ajax({
+            type:"post",
+            url:"orders",
+            data:{_method:"put",orderNum:num, state:state},
+//			data:{_method:"put",order:order},
+            dataType:"json",
+            success:function(data){
+                if(data.code===1){
+//                    window.location.reload();
+                    loadData(currentPage);
+                }else{
+                    alert(data.msg);
+                }
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

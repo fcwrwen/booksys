@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>添加图书</title>
+<style>
+	label.error{
+		color:red;
+	}
+</style>
+<script type="text/javascript" src="/js/jquery-1.12.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/jquery.form.min.js"></script>
+
+</head>
+<body>
+
+<div id="upload">
+	<h2></h2>
+	<form id="#" method="post" action="/" enctype="multipart/form-data" onsubmit="return false;">
+		<table>
+		<tr>
+			<td width="50px">书名</td>
+			<td><input class="input-text" type="text" name="bookName" /></td>
+		</tr>
+		<tr>
+			<td>价格</td>
+			<td><input class="input-text" type="number" name="price" /></td>
+		</tr>
+		<tr>
+			<td>库存</td>
+			<td><input class="input-text" type="number" name="stock" /></td>
+		</tr>
+		<tr>
+			<td>图片</td>
+			<td><input class="input-text" type="file" name="imgfile" /></td>
+		</tr>
+		<tr>
+			<td class="button"><input class="input-btn" type="submit" name="submit" value="添加" /></td>
+            <td class="button"><input class="input-btn" type="button" value="取消" onclick=window.close();></td>
+		</tr>
+		</table>
+	</form>
+</div>
+
+<script>
+    $(function(){
+        $("form").validate({
+
+            submitHandler:function(){
+                //jquery.form.js中提供的异步上传文件的方法
+                $("form").ajaxSubmit({
+                    type:"post",
+                    url:"/upload.do",	//如果仅写"upload.do"为相对路径，相当于admin/xxx/upload.do
+                    data:$("form").serialize(),
+                    dataType:"json",
+                    success:function(data){
+                        alert("添加成功");
+                        window.close();
+                        // window.location.reload();
+                    }
+                })
+            },
+
+            rules: {
+                bookName: "required",
+                price: {
+                    required: true,
+                    number:true,
+                    min:0
+                },
+                stock: {
+                    required: true,
+                    number:true,
+                    digits:true,
+                    min:0
+                },
+                imgfile: {
+                    required: true
+                }
+            },
+            messages:{
+                bookName:"书名不能为空",
+                price: {
+                    required: "价格不能为空",
+                    number:"请输入数字",
+                    min:"请输入正确的价格"
+                },
+                stock: {
+                    required: "库存不能为空",
+                    number:"请输入数字",
+                    digits:"库存必须为整数",
+                    min:"请输入正确的价格"
+                },
+                imgfile: {
+                    required: "请选择图片"
+                }
+            }
+
+        })
+    })
+</script>
+
+
+
+</body>
+</html>

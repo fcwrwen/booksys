@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sdust.dao.IOrderItemDao">
+
+	<resultMap type="item" id="itemMapper">
+		<id property="id" column="id"/>
+		<result property="num" column="b_num"/>
+		<!-- 嵌套结果 -->
+		<association property="order" resultMap="com.sdust.dao.IOrderDao.orderMapper"></association>
+		<association property="book" resultMap="com.sdust.dao.IBookDao.bookMapper"></association>
+	</resultMap>
+	
+	<insert id="add" parameterType="item">
+		INSERT INTO order_items(order_id, book_id, b_num)
+		VALUES(#{order.id}, #{book.id}, #{num});
+
+		UPDATE book b SET b.stock=#{book.stock} WHERE b.id=#{book.id}
+	</insert>
+
+	<select id="findByIndex" parameterType="map" resultMap="itemMapper">
+		<!-- mybatis限制，item.*必须写在最前 -->
+		SELECT item.*, o.*, b.*, u.* FROM orders o
+		INNER JOIN order_items item
+		ON o.id = item.order_id
+		INNER JOIN book b
+		ON b.id = item.book_id
+		INNER JOIN user u
+		ON u.id = o.buyer_id
+		WHERE u.u_name = #{name} AND o.id
+		IN (SELECT t.id FROM (SELECT id FROM orders LIMIT #{index},#{size}) t)
+		ORDER BY order_id
+	</select>
+
+    <select id="findByIndex0" parameterType="map" resultMap="itemMapper">
+        <!-- mybatis限制，item.*必须写在最前 -->
+        SELECT item.*, o.*, b.*, u.* FROM orders o
+        INNER JOIN order_items item
+        ON o.id = item.order_id
+        INNER JOIN book b
+        ON b.id = item.book_id
+        INNER JOIN user u
+        ON u.id = o.buyer_id
+        WHERE u.u_name = #{name} AND o.id
+        IN (SELECT t.id FROM (SELECT id FROM orders WHERE state=0 LIMIT #{index},#{size}) t)
+        ORDER BY order_id
+    </select>
+
+    <select id="findByIndex1" parameterType="map" resultMap="itemMapper">
+        SELECT item.*, o.*, b.*, u.* FROM orders o
+        INNER JOIN order_items item
+        ON o.id = item.order_id
+        INNER JOIN book b
+        ON b.id = item.book_id
+        INNER JOIN user u
+        ON u.id = o.buyer_id
+        WHERE u.u_name = #{name} AND o.id
+        IN (SELECT t.id FROM (SELECT id FROM orders WHERE state=1 LIMIT #{index},#{size}) t)
+        ORDER BY order_id
+    </select>
+
+    <select id="findByIndex2" parameterType="map" resultMap="itemMapper">
+        SELECT item.*, o.*, b.*, u.* FROM orders o
+        INNER JOIN order_items item
+        ON o.id = item.order_id
+        INNER JOIN book b
+        ON b.id = item.book_id
+        INNER JOIN user u
+        ON u.id = o.buyer_id
+        WHERE u.u_name = #{name} AND o.id
+        IN (SELECT t.id FROM (SELECT id FROM orders WHERE state=2 LIMIT #{index},#{size}) t)
+        ORDER BY order_id
+    </select>
+
+    <select id="findByIndex3" parameterType="map" resultMap="itemMapper">
+        SELECT item.*, o.*, b.*, u.* FROM orders o
+        INNER JOIN order_items item
+        ON o.id = item.order_id
+        INNER JOIN book b
+        ON b.id = item.book_id
+        INNER JOIN user u
+        ON u.id = o.buyer_id
+        WHERE u.u_name = #{name} AND o.id
+        IN (SELECT t.id FROM (SELECT id FROM orders WHERE state=3 LIMIT #{index},#{size}) t)
+        ORDER BY order_id
+    </select>
+
+    <select id="findByIndex4" parameterType="map" resultMap="itemMapper">
+        SELECT item.*, o.*, b.*, u.* FROM orders o
+        INNER JOIN order_items item
+        ON o.id = item.order_id
+        INNER JOIN book b
+        ON b.id = item.book_id
+        INNER JOIN user u
+        ON u.id = o.buyer_id
+        WHERE u.u_name = #{name} AND o.id
+        IN (SELECT t.id FROM (SELECT id FROM orders WHERE state=4 LIMIT #{index},#{size}) t)
+        ORDER BY order_id
+    </select>
+
+    <select id="findByName" parameterType="string" resultMap="itemMapper">
+        SELECT item.*, o.*, b.*, u.* FROM orders o
+        INNER JOIN order_items item
+        ON o.id = item.order_id
+        INNER JOIN book b
+        ON b.id = item.book_id
+        INNER JOIN user u
+        ON u.id = o.buyer_id
+        WHERE o.o_num=#{orderNum}
+    </select>
+
+    <delete id="delete" parameterType="item">
+        DELETE item FROM order_items item
+            INNER JOIN orders o
+                ON o.id=item.order_id
+        WHERE o.o_num=#{order.orderNum}
+    </delete>
+
+</mapper>
